@@ -1,4 +1,5 @@
 drop table if exists todo cascade;
+drop table if exists hibernate_sequence;
 
 create table todo
 (
@@ -12,5 +13,8 @@ create table todo
     due_date			timestamp
 ) engine = InnoDB;
 
-insert into todo (title, description, owner_id, todo_status, due_date)
-values ("test title", "test description", 0, 0, '2022-01-01 08:00:00');
+create table hibernate_sequence (
+    next_val bigint
+) engine=InnoDB;
+
+insert into hibernate_sequence values ( 1 );
