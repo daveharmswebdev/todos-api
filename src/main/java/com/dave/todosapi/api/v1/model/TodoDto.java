@@ -1,8 +1,8 @@
-package com.dave.todosapi.domain.dto;
+package com.dave.todosapi.api.v1.model;
 
 import java.util.Date;
 
-public class TodoToCreateDto {
+public class TodoDto {
 
     private String title;
     private String description;

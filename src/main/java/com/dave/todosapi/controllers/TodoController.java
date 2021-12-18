@@ -2,7 +2,7 @@ package com.dave.todosapi.controllers;
 
 import com.dave.todosapi.TodoRepository;
 import com.dave.todosapi.domain.Todo;
-import com.dave.todosapi.domain.dto.TodoToCreateDto;
+import com.dave.todosapi.api.v1.model.TodoDto;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
@@ -30,7 +30,7 @@ public class TodoController {
     }
 
     @PostMapping
-    public Todo newTodo(@RequestBody TodoToCreateDto dto) {
+    public Todo newTodo(@RequestBody TodoDto dto) {
 
         Todo newTodo = new Todo();
 
