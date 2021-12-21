@@ -13,4 +13,6 @@ public interface TodoService {
     TodoDto createNewTodo(TodoDto todoDto);
 
     TodoDto saveTodoByDto(long id, TodoDto todoDto);
+
+    void deleteTodoById(Long id);
 }

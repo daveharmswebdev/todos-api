@@ -4,10 +4,12 @@ import com.dave.todosapi.TodoRepository;
 import com.dave.todosapi.api.v1.mapper.TodoMapper;
 import com.dave.todosapi.api.v1.model.TodoDto;
 import com.dave.todosapi.domain.Todo;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class TodoServiceImpl implements TodoService {
 
     private final TodoMapper todoMapper;
@@ -22,15 +24,23 @@ public class TodoServiceImpl implements TodoService {
     public List<TodoDto> getAllTodos() {
         return todoRepository.findAll()
                 .stream()
-                .map(todoMapper::todoToTodoDto)
+                .map(todo -> {
+                    TodoDto todoDto = todoMapper.todoToTodoDto(todo);
+                    todoDto.setTodoUrl("/api/todos/" + todo.getId());
+                    return todoDto;
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
     public TodoDto getTodoById(Long id) {
         return todoRepository.findById(id)
-                .map(todoMapper::todoToTodoDto)
-                .orElseThrow(RuntimeException::new);
+                .map(todo -> {
+                    TodoDto todoDto = todoMapper.todoToTodoDto(todo);
+                    todoDto.setTodoUrl("/api/todos/" + todo.getId());
+                    return todoDto;
+                })
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
@@ -50,5 +60,11 @@ public class TodoServiceImpl implements TodoService {
         Todo todo = todoMapper.todoDtoToTodo(todoDto);
         todo.setId(id);
         return saveAndReturnDto(todo);
+    }
+
+    @Override
+    public void deleteTodoById(Long id) {
+        getTodoById(id);
+        todoRepository.deleteById(id);
     }
 }

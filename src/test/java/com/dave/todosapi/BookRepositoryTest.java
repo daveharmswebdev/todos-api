@@ -22,6 +22,6 @@ public class BookRepositoryTest {
         List<Todo> todos = todoRepository.findAll();
 
         assertThat(todos).isNotNull();
-        assertThat(todos.size()).isGreaterThan(4);
+        assertThat(todos.size()).isGreaterThan(2);
     }
 }

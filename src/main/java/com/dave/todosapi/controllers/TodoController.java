@@ -1,70 +1,65 @@
 package com.dave.todosapi.controllers;
 
 import com.dave.todosapi.TodoRepository;
+import com.dave.todosapi.api.v1.model.TodoListDto;
 import com.dave.todosapi.domain.Todo;
 import com.dave.todosapi.api.v1.model.TodoDto;
+import com.dave.todosapi.service.TodoService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
+@Controller
 @RequestMapping("/api/todos")
 public class TodoController {
 
-    private final TodoRepository repository;
+    private final TodoService todoService;
 
-    public TodoController(TodoRepository todoRepository) {
-        this.repository = todoRepository;
+    public TodoController(TodoService todoService) {
+        this.todoService = todoService;
     }
+
+//    @GetMapping
+//    public ResponseEntity<List<TodoDto>> getTodos() {
+//        List<TodoDto> todos = todoService.getAllTodos();
+//        return new ResponseEntity<List<TodoDto>>(todos, HttpStatus.OK);
+//    }
 
     @GetMapping
-    public List<Todo> getTodos() {
-        return repository.findAll();
+    public ResponseEntity<TodoListDto> getTodos() {
+        List<TodoDto> todos = todoService.getAllTodos();
+        TodoListDto response = new TodoListDto();
+        response.setTodos(todos);
+        return new ResponseEntity<TodoListDto>(response, HttpStatus.OK);
     }
 
-    @GetMapping("{todoId}")
-    public Optional<Todo> getTodoById(@PathVariable Long todoId) {
-        return repository.findById(todoId);
+    @GetMapping("/{todoId}")
+    public ResponseEntity<TodoDto> getTodoById(@PathVariable Long todoId) {
+        return new ResponseEntity<TodoDto>(todoService.getTodoById(todoId), HttpStatus.OK);
     }
 
     @PostMapping
-    public Todo newTodo(@RequestBody TodoDto dto) {
+    public ResponseEntity<TodoDto> createNewTodo(@RequestBody TodoDto todoDto) {
 
-        Todo newTodo = new Todo();
+        TodoDto fromService = todoService.createNewTodo(todoDto);
 
-        newTodo.setTitle(dto.getTitle());
-        newTodo.setDescription(dto.getDescription());
-        newTodo.setOwnerId(dto.getOwnerId());
-        newTodo.setTodoStatus(0);
-        newTodo.setCreated(Calendar.getInstance().getTime());
-        newTodo.setModified(Calendar.getInstance().getTime());
-        newTodo.setDueDate(dto.getDueDate());
-
-        return repository.save(newTodo);
+        return new ResponseEntity<TodoDto>(fromService, HttpStatus.CREATED);
     }
 
-    @PutMapping("{id}")
-    public Todo putTodo(@RequestBody Todo newTodo, @PathVariable Long id) {
-        return repository.findById(id)
-                .map(todo -> {
-                    todo.setTitle(newTodo.getTitle());
-                    todo.setDescription(newTodo.getDescription());
-                    todo.setOwnerId(newTodo.getOwnerId());
-                    todo.setTodoStatus(newTodo.getTodoStatus());
-                    todo.setModified(Calendar.getInstance().getTime());
-                    todo.setDueDate(todo.getDueDate());
-                    return repository.save(todo);
-                })
-                .orElseGet(() -> {
-                    newTodo.setId(id);
-                    return  repository.save(newTodo);
-                });
+    @PutMapping("/{id}")
+    public ResponseEntity<TodoDto> updateTodo(@PathVariable Long id, @RequestBody TodoDto todoDto) {
+        return new ResponseEntity<TodoDto>(todoService.saveTodoByDto(id, todoDto), HttpStatus.OK);
     }
 
-    @DeleteMapping("{todoId}")
-    public void deleteTodo(@PathVariable Long todoId) {
-        repository.deleteById(todoId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTodo(@PathVariable Long id) {
+        todoService.deleteTodoById(id);
+
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
 }
